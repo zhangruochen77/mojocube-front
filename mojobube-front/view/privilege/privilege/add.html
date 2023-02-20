@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../component/pear/css/pear.css" />
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" required  lay-verify="required" placeholder="请输入权限名" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限规则</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="uri" required  lay-verify="required" placeholder="请输入权限规则" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">权限标记</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="tag" required  lay-verify="required" placeholder="请输入权限标记" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="privilege-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="../../../component/layui/layui.js"></script>
+<script src="../../../component/pear/pear.js"></script>
+
+
+<script>
+layui.use(['form','jquery','upload','dtree'],function(){
+    let form = layui.form;
+    let $ = layui.jquery;
+    let upload = layui.upload;
+
+
+
+
+    form.on('submit(privilege-save)', function(data){
+
+        $.ajax({
+            url:'http://localhost:8080/sunshine/permission/add',
+            data:JSON.stringify(data.field),
+            dataType:'json',
+            headers: {
+                token: localStorage.getItem("token")
+            },
+            contentType:'application/json',
+            type:'post',
+            success:function(result){
+                if(result.code==0){
+                    layer.msg(result.msg,{icon:1,time:1000},function(){
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        window.parent.location.reload()
+                    });
+                }else{
+                    layer.msg(result.msg,{icon:2,time:1000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>

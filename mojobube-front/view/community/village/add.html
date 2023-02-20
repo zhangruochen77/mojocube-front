@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../../component/pear/css/pear.css" />
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <div class="main-container">
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">小区名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入小区名称" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">小区编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="number" required  lay-verify="required" placeholder="请输入小区编号" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">小区地址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="address" lay-verify="required" autocomplete="off" placeholder="请输入小区地址" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">总栋数</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="totalBuildings" required  lay-verify="required" placeholder="请输入总栋数" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">总户数</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="totalHouseholds" lay-verify="required" autocomplete="off" placeholder="请输入总户数" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">物业名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="tenementName" required  lay-verify="required" placeholder="请输入物业名称" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn" id="test1">上传图片</button>
+                    <div class="layui-upload-list">
+                        <img class="layui-upload-img" id="demo1" style="width: 200px;height: 150px">
+                        <p id="demoText"></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="layui-btn layui-btn-normal layui-btn-sm" lay-submit="" lay-filter="user-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="../../../component/layui/layui.js"></script>
+<script src="../../../component/pear/pear.js"></script>
+
+
+<script>
+layui.use(['form','jquery','upload','dtree'],function(){
+    let form = layui.form;
+    let $ = layui.jquery;
+    let upload = layui.upload;
+
+
+    //普通图片上传
+    var uploadInst = upload.render({
+        elem: '#test1'
+        ,url: 'http://localhost:8080/sunshine/uploadImage' //改成您自己的上传接口
+        ,field:"image"//上传文件的字段名
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#demo1').attr('src', result); //图片链接（base64）
+            });
+        }
+        ,done: function(res){
+            //如果上传失败
+            if(res.code > 0){
+                return layer.msg('上传失败');
+            }
+            //上传成功 前端需要把图片存储在隐藏域中
+            $(".layui-form").append("<input  class='image' type='hidden' name='image' value='"+res.data+"'>");
+        }
+    });
+
+
+    form.on('submit(user-save)', function(data){
+
+        //获取隐藏域中的图片
+        data.field.image=$(".image")[0].value;
+
+        $.ajax({
+            url:'http://localhost:8080/sunshine/village/add',
+            data:JSON.stringify(data.field),
+            dataType:'json',
+            contentType:'application/json',
+            type:'post',
+            success:function(result){
+                if(result.code==0){
+                    layer.msg(result.msg,{icon:1,time:1000},function(){
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));//关闭当前页
+                        window.parent.location.reload()
+                    });
+                }else{
+                    layer.msg(result.msg,{icon:2,time:1000});
+                }
+            }
+        })
+        return false;
+    });
+})
+</script>
+<script>
+</script>
+</body>
+</html>
